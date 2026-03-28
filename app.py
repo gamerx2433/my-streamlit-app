@@ -142,6 +142,23 @@ input:focus, textarea:focus {{
     background: rgba(124,106,247,0.1) !important;
 }}
 
+/* Form submit button */
+[data-testid="stFormSubmitButton"] button {{
+    background: linear-gradient(135deg, {accent}, #9B59F7) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    letter-spacing: 1px !important;
+    transition: all 0.2s ease !important;
+}}
+[data-testid="stFormSubmitButton"] button:hover {{
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 25px rgba(124,106,247,0.4) !important;
+}}
+
 /* Forms */
 .stForm {{ border: none !important; padding: 0 !important; background: transparent !important; }}
 [data-testid="stForm"] {{ background: transparent !important; border: none !important; }}
@@ -327,7 +344,7 @@ if not st.session_state.auth_status:
             email_in = st.text_input("📧 Email Address", key="login_email", placeholder="you@hospital.com")
             pass_in  = st.text_input("🔑 Password", type="password", key="login_pass", placeholder="••••••••••")
             st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-            submit = st.form_submit_button("Authorize Access  ➜", use_container_width=True)
+            submit = st.form_submit_button("Authorize Access >>", use_container_width=True)
             if submit:
                 try:
                     res = supabase.auth.sign_in_with_password({"email": email_in, "password": pass_in})
