@@ -20,15 +20,15 @@ defaults = {
     "role": "Doctor",
     "auth_status": False,
     "user_uuid": None,
-    "patient_view": None,   # stores selected patient record for detail view
-    "page": "main",         # 'main' | 'patient_report'
+    "patient_view": None,
+    "page": "main",
 }
 for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
 # --- 3. THEME ---
-dark = st.session_state.theme == "Dark"
+dark    = st.session_state.theme == "Dark"
 bg      = "#0A0A0F" if dark else "#F4F6FA"
 surface = "#13131C" if dark else "#FFFFFF"
 card    = "#1A1A28" if dark else "#FFFFFF"
@@ -37,9 +37,8 @@ muted   = "#6B6B8A" if dark else "#8A8AB0"
 accent  = "#7C6AF7"
 accent2 = "#4FD1C5"
 border  = "#2A2A40" if dark else "#E0E0EF"
-danger  = "#F56565"
-success = "#48BB78"
-theme_label = "☀️ Light Mode" if dark else "🌙 Dark Mode"
+theme_label   = "Light Mode" if dark else "Dark Mode"
+switch_target = "Patient" if st.session_state.role == "Doctor" else "Doctor"
 
 st.markdown(f"""
 <style>
@@ -52,7 +51,6 @@ st.markdown(f"""
     font-family: 'Space Grotesk', sans-serif !important;
 }}
 
-/* Sidebar */
 [data-testid="stSidebar"] {{
     background: {surface} !important;
     border-right: 1px solid {border} !important;
@@ -69,6 +67,7 @@ st.markdown(f"""
     transition: all 0.2s ease !important;
     width: 100% !important;
     text-align: left !important;
+    font-weight: 500 !important;
 }}
 [data-testid="stSidebar"] .stButton>button:hover {{
     border-color: {accent} !important;
@@ -76,14 +75,12 @@ st.markdown(f"""
     background: rgba(124,106,247,0.08) !important;
 }}
 
-/* Global text */
 h1, h2, h3, h4, h5, p, span, label, div, .stMarkdown,
 [data-testid="stMarkdownContainer"] {{
     color: {txt} !important;
     font-family: 'Space Grotesk', sans-serif !important;
 }}
 
-/* Inputs */
 input, textarea {{
     background-color: {card} !important;
     border: 1px solid {border} !important;
@@ -96,7 +93,6 @@ input:focus, textarea:focus {{
     box-shadow: 0 0 0 3px rgba(124,106,247,0.15) !important;
 }}
 
-/* Selectbox */
 [data-baseweb="select"] > div {{
     background-color: {card} !important;
     border: 1px solid {border} !important;
@@ -112,7 +108,6 @@ input:focus, textarea:focus {{
 [role="option"] {{ color: {txt} !important; }}
 [role="option"]:hover {{ background: rgba(124,106,247,0.15) !important; }}
 
-/* Main buttons */
 .stButton>button {{
     background: linear-gradient(135deg, {accent}, #9B59F7) !important;
     color: #FFFFFF !important;
@@ -130,19 +125,6 @@ input:focus, textarea:focus {{
     box-shadow: 0 8px 25px rgba(124,106,247,0.4) !important;
 }}
 
-/* Download buttons */
-[data-testid="stDownloadButton"] button {{
-    background: transparent !important;
-    border: 1px solid {accent} !important;
-    color: {accent} !important;
-    border-radius: 8px !important;
-    font-weight: 500 !important;
-}}
-[data-testid="stDownloadButton"] button:hover {{
-    background: rgba(124,106,247,0.1) !important;
-}}
-
-/* Form submit button */
 [data-testid="stFormSubmitButton"] button {{
     background: linear-gradient(135deg, {accent}, #9B59F7) !important;
     color: #FFFFFF !important;
@@ -151,48 +133,57 @@ input:focus, textarea:focus {{
     font-family: 'Space Grotesk', sans-serif !important;
     font-weight: 700 !important;
     font-size: 15px !important;
-    letter-spacing: 1px !important;
+    letter-spacing: 0.5px !important;
     transition: all 0.2s ease !important;
+    padding: 12px 20px !important;
 }}
 [data-testid="stFormSubmitButton"] button:hover {{
     transform: translateY(-1px) !important;
     box-shadow: 0 8px 25px rgba(124,106,247,0.4) !important;
 }}
 
-/* Forms */
-.stForm {{ border: none !important; padding: 0 !important; background: transparent !important; }}
-[data-testid="stForm"] {{ background: transparent !important; border: none !important; }}
+[data-testid="stDownloadButton"] button {{
+    background: transparent !important;
+    border: 1px solid {accent} !important;
+    color: {accent} !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+}}
+[data-testid="stDownloadButton"] button:hover {{
+    background: rgba(124,106,247,0.1) !important;
+}}
 
-/* Number input */
+.stForm, [data-testid="stForm"] {{
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}}
+
 [data-baseweb="input"] {{
     background-color: {card} !important;
     border: 1px solid {border} !important;
     border-radius: 8px !important;
 }}
 
-/* File uploader */
 [data-testid="stFileUploader"] {{
     background: {card} !important;
     border: 2px dashed {border} !important;
     border-radius: 12px !important;
 }}
 
-/* Divider */
 hr {{ border-color: {border} !important; }}
 
-/* Status/spinner */
-[data-testid="stStatusWidget"] {{ background: {card} !important; border: 1px solid {border} !important; border-radius: 12px !important; }}
+[data-testid="stStatusWidget"] {{
+    background: {card} !important;
+    border: 1px solid {border} !important;
+    border-radius: 12px !important;
+}}
 
-/* Caption */
 .stCaption {{ color: {muted} !important; font-size: 12px !important; }}
 
-/* Radio — pill style */
-[data-testid="stRadio"] > div {{
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 8px !important;
-    flex-wrap: wrap !important;
-}}
+[data-testid="stRadio"] > div {{ gap: 8px !important; flex-wrap: wrap !important; }}
 [data-testid="stRadio"] label {{
     background: {card} !important;
     border: 1px solid {border} !important;
@@ -207,76 +198,58 @@ hr {{ border-color: {border} !important; }}
 [data-testid="stRadio"] label:hover {{
     border-color: {accent} !important;
     color: {accent} !important;
-    background: rgba(124,106,247,0.08) !important;
 }}
-/* Hide the actual radio circle dot */
-[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {{ margin: 0 !important; }}
 [data-testid="stRadio"] input[type="radio"] {{ display: none !important; }}
-[data-testid="stRadio"] input[type="radio"]:checked + div label,
-[data-testid="stRadio"] div:has(input:checked) label {{
-    background: {accent} !important;
-    border-color: {accent} !important;
-    color: #fff !important;
-}}
 
-/* Metric */
 [data-testid="metric-container"] {{
     background: {card} !important;
     border: 1px solid {border} !important;
     border-radius: 12px !important;
     padding: 16px !important;
 }}
+
+[data-testid="stTabs"] [role="tab"] {{
+    color: {muted} !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 500 !important;
+}}
+[data-testid="stTabs"] [role="tab"][aria-selected="true"] {{
+    color: {accent} !important;
+    border-bottom-color: {accent} !important;
+}}
 </style>
 """, unsafe_allow_html=True)
 
-# --- CUSTOM COMPONENTS ---
-def page_header(icon, title, subtitle=""):
+
+# ─── HELPERS ────────────────────────────────────────
+def page_header(title, subtitle=""):
     st.markdown(f"""
-    <div style="padding: 8px 0 28px 0;">
-        <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-            <span style="font-size:32px;">{icon}</span>
-            <h1 style="margin:0; font-size:28px; font-weight:700; letter-spacing:-0.5px; color:{txt} !important;">{title}</h1>
-        </div>
-        {"" if not subtitle else f'<p style="color:{muted}; margin:0; font-size:14px; padding-left:46px;">{subtitle}</p>'}
+    <div style="padding:8px 0 28px 0;">
+        <h1 style="margin:0; font-size:26px; font-weight:700; letter-spacing:-0.5px;">{title}</h1>
+        {"" if not subtitle else f'<p style="color:{muted}; margin:4px 0 0 0; font-size:14px;">{subtitle}</p>'}
     </div>
     """, unsafe_allow_html=True)
 
 def stat_card(label, value, color=None):
     c = color or accent
-    return f"""
-    <div style="background:{card}; border:1px solid {border}; border-radius:12px; padding:18px 20px; flex:1;">
+    return f"""<div style="background:{card}; border:1px solid {border}; border-radius:12px; padding:18px 20px; flex:1;">
         <div style="color:{muted}; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">{label}</div>
-        <div style="color:{c}; font-size:22px; font-weight:700; font-family:'JetBrains Mono', monospace;">{value}</div>
-    </div>
-    """
+        <div style="color:{c}; font-size:22px; font-weight:700; font-family:'JetBrains Mono',monospace;">{value}</div>
+    </div>"""
 
 def report_card(content, border_color=None):
     bc = border_color or border
-    st.markdown(f"""
-    <div style="
-        background:{card};
-        border:1px solid {bc};
-        border-left: 4px solid {accent};
-        border-radius:12px;
-        padding:24px 28px;
-        margin:12px 0;
-        line-height:1.75;
-        font-size:14px;
-        color:{txt};
-        white-space:pre-wrap;
-    ">{content}</div>
+    st.markdown(f"""<div style="background:{card}; border:1px solid {bc}; border-left:4px solid {accent};
+        border-radius:12px; padding:24px 28px; margin:12px 0; line-height:1.75;
+        font-size:14px; color:{txt}; white-space:pre-wrap;">{content}</div>
     """, unsafe_allow_html=True)
 
-def badge(text, color):
-    return f'<span style="background:rgba(124,106,247,0.15); color:{color}; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; border:1px solid {color}40;">{text}</span>'
 
-# ─────────────────────────────────────────
-# --- 4. SIDEBAR ---
-# ─────────────────────────────────────────
+# ─── SIDEBAR ────────────────────────────────────────
 with st.sidebar:
     st.markdown(f"""
-    <div style="padding: 10px 0 20px 0;">
-        <div style="font-size:22px; font-weight:700; letter-spacing:-0.5px;">🧠 CogniScan</div>
+    <div style="padding:10px 0 20px 0;">
+        <div style="font-size:20px; font-weight:700; letter-spacing:-0.5px;">CogniScan</div>
         <div style="color:{muted}; font-size:12px; margin-top:4px;">Neural Screening Platform</div>
     </div>
     """, unsafe_allow_html=True)
@@ -287,17 +260,16 @@ with st.sidebar:
 
     st.markdown(f"<div style='height:1px; background:{border}; margin:16px 0;'></div>", unsafe_allow_html=True)
 
-    role_icon = "👨‍⚕️" if st.session_state.role == "Doctor" else "🏠"
     st.markdown(f"""
-    <div style="background:rgba(124,106,247,0.1); border:1px solid rgba(124,106,247,0.3); border-radius:8px; padding:10px 14px; margin-bottom:12px;">
+    <div style="background:rgba(124,106,247,0.1); border:1px solid rgba(124,106,247,0.3);
+         border-radius:8px; padding:10px 14px; margin-bottom:12px;">
         <div style="color:{muted}; font-size:11px; text-transform:uppercase; letter-spacing:1px;">Active Portal</div>
-        <div style="font-weight:600; font-size:14px; margin-top:3px;">{role_icon} {st.session_state.role} Mode</div>
+        <div style="font-weight:600; font-size:14px; margin-top:3px;">{st.session_state.role} Mode</div>
     </div>
     """, unsafe_allow_html=True)
 
-    switch_label = "Patient" if st.session_state.role == "Doctor" else "Doctor"
-    if st.button(f"🔄 Switch to {switch_label}", key="switch_btn"):
-        st.session_state.role = switch_label
+    if st.button(f"Switch to {switch_target}", key="switch_btn"):
+        st.session_state.role = switch_target
         st.session_state.auth_status = False
         st.session_state.page = "main"
         st.session_state.patient_view = None
@@ -305,15 +277,12 @@ with st.sidebar:
 
     if st.session_state.auth_status:
         st.markdown(f"<div style='height:1px; background:{border}; margin:16px 0;'></div>", unsafe_allow_html=True)
-        # Doctor: extra nav
-        if st.session_state.role == "Doctor":
-            if st.session_state.page == "patient_report":
-                if st.button("← Back to Dashboard", key="back_btn"):
-                    st.session_state.page = "main"
-                    st.session_state.patient_view = None
-                    st.rerun()
-        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-        if st.button("⬅️ Log Out", key="logout_btn"):
+        if st.session_state.role == "Doctor" and st.session_state.page == "patient_report":
+            if st.button("Back to Dashboard", key="back_btn"):
+                st.session_state.page = "main"
+                st.session_state.patient_view = None
+                st.rerun()
+        if st.button("Log Out", key="logout_btn"):
             st.session_state.auth_status = False
             st.session_state.page = "main"
             st.session_state.patient_view = None
@@ -321,28 +290,30 @@ with st.sidebar:
 
     st.markdown(f"""
     <div style="position:fixed; bottom:20px; left:0; width:240px; padding:0 16px;">
-        <div style="color:{muted}; font-size:11px; text-align:center;">© 2026 CogniScan · NVIDIA NIM</div>
+        <div style="color:{muted}; font-size:11px; text-align:center;">2026 CogniScan · NVIDIA NIM</div>
     </div>
     """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────
-# --- 5. LOGIN ---
-# ─────────────────────────────────────────
+
+# ─── LOGIN ───────────────────────────────────────────
 if not st.session_state.auth_status:
     col_l, col_c, col_r = st.columns([1, 1.2, 1])
     with col_c:
         st.markdown(f"""
-        <div style="text-align:center; padding: 40px 0 32px 0;">
+        <div style="text-align:center; padding:40px 0 32px 0;">
             <div style="font-size:48px; margin-bottom:12px;">🧠</div>
             <h1 style="font-size:26px; font-weight:700; margin:0; letter-spacing:-0.5px;">Welcome to CogniScan</h1>
-            <p style="color:{muted}; font-size:14px; margin-top:6px;">Sign in to access the {st.session_state.role} Portal</p>
+            <p style="color:{muted}; font-size:14px; margin-top:6px;">
+                Sign in to access the {st.session_state.role} Portal
+            </p>
         </div>
-        <div style="background:{card}; border:1px solid {border}; border-radius:16px; padding:32px;">
+        <div style="background:{card}; border:1px solid {border}; border-radius:16px; padding:32px 32px 8px 32px;">
+        </div>
         """, unsafe_allow_html=True)
 
         with st.form("login_form", clear_on_submit=False):
-            email_in = st.text_input("📧 Email Address", key="login_email", placeholder="you@hospital.com")
-            pass_in  = st.text_input("🔑 Password", type="password", key="login_pass", placeholder="••••••••••")
+            email_in = st.text_input("Email Address", key="login_email", placeholder="you@hospital.com")
+            pass_in  = st.text_input("Password", type="password", key="login_pass", placeholder="Enter password")
             st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
             submit = st.form_submit_button("Authorize Access", use_container_width=True)
             if submit:
@@ -350,26 +321,21 @@ if not st.session_state.auth_status:
                     res = supabase.auth.sign_in_with_password({"email": email_in, "password": pass_in})
                     st.session_state.auth_status = True
                     st.session_state.user_uuid = res.user.id
-                    st.success("✅ Access Granted!")
+                    st.success("Access Granted!")
                     time.sleep(0.5)
                     st.rerun()
                 except Exception:
-                    st.error("❌ Invalid credentials. Please try again.")
+                    st.error("Invalid credentials. Please try again.")
 
-        st.markdown("</div>", unsafe_allow_html=True)
 
-# ─────────────────────────────────────────
-# --- 6. PATIENT REPORT DETAIL PAGE ---
-# ─────────────────────────────────────────
+# ─── PATIENT REPORT DETAIL ───────────────────────────
 elif st.session_state.page == "patient_report" and st.session_state.patient_view:
     r = st.session_state.patient_view
+    pid_val  = r.get("patient_id", "N/A")
+    age_val  = r.get("age", "-")
+    date_val = r.get("created_at", "")[:10] if r.get("created_at") else "-"
 
-    page_header("📋", f"Patient Report — {r.get('patient_id','N/A')}", f"Full diagnostic record · Created {r.get('created_at','')[:10]}")
-
-    # Stats row
-    age_val = r.get('age', '—')
-    pid_val = r.get('patient_id', '—')
-    date_val = r.get('created_at', '')[:10] if r.get('created_at') else '—'
+    page_header(f"Patient Report - {pid_val}", f"Full diagnostic record · Created {date_val}")
 
     st.markdown(f"""
     <div style="display:flex; gap:14px; margin-bottom:28px;">
@@ -379,60 +345,40 @@ elif st.session_state.page == "patient_report" and st.session_state.patient_view
     </div>
     """, unsafe_allow_html=True)
 
-    tab1, tab2 = st.tabs(["🩺 Physician Report", "🏠 Family Guide"])
-
+    tab1, tab2 = st.tabs(["Physician Report", "Family Guide"])
     with tab1:
         st.markdown(f"<div style='color:{muted}; font-size:13px; margin-bottom:12px;'>Technical clinical analysis for physician review</div>", unsafe_allow_html=True)
-        report_card(r.get('doctor_report', 'No clinical report available.'))
-        st.download_button(
-            "📑 Download Physician Report",
-            data=f"CLINICAL REPORT — {pid_val}\nDate: {date_val}\n\n{r.get('doctor_report','')}",
-            file_name=f"Clinical_{pid_val}.txt",
-            use_container_width=True
-        )
-
+        report_card(r.get("doctor_report", "No clinical report available."))
+        st.download_button("Download Physician Report",
+            data=f"CLINICAL REPORT - {pid_val}\nDate: {date_val}\n\n{r.get('doctor_report','')}",
+            file_name=f"Clinical_{pid_val}.txt", use_container_width=True)
     with tab2:
         st.markdown(f"<div style='color:{muted}; font-size:13px; margin-bottom:12px;'>Plain-language summary for patient and family</div>", unsafe_allow_html=True)
-        report_card(r.get('family_guide', 'No family guide available.'), border_color=accent2)
-        st.download_button(
-            "🏡 Download Family Guide",
-            data=f"FAMILY GUIDE — {pid_val}\nDate: {date_val}\n\n{r.get('family_guide','')}",
-            file_name=f"Family_{pid_val}.txt",
-            use_container_width=True
-        )
+        report_card(r.get("family_guide", "No family guide available."), border_color=accent2)
+        st.download_button("Download Family Guide",
+            data=f"FAMILY GUIDE - {pid_val}\nDate: {date_val}\n\n{r.get('family_guide','')}",
+            file_name=f"Family_{pid_val}.txt", use_container_width=True)
 
-# ─────────────────────────────────────────
-# --- 7. DOCTOR PORTAL (MAIN) ---
-# ─────────────────────────────────────────
+
+# ─── DOCTOR PORTAL ───────────────────────────────────
 elif st.session_state.role == "Doctor":
-    page_header("🧠", "Cognitive Screening Suite", "Upload session video and run AI-powered neuro analysis")
+    page_header("Cognitive Screening Suite", "Upload session video and run AI-powered neuro analysis")
 
-    # ── New Analysis ──────────────────────────────
     st.markdown(f"<div style='color:{muted}; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;'>New Analysis</div>", unsafe_allow_html=True)
 
     with st.container():
-        st.markdown(f"<div style='background:{card}; border:1px solid {border}; border-radius:14px; padding:24px;'>", unsafe_allow_html=True)
-
         c1, c2, c3 = st.columns([2, 1, 1])
         p_id  = c1.text_input("Patient ID", value="NC-2026", placeholder="NC-2026")
         p_age = c2.number_input("Age", min_value=18, max_value=110, value=72)
-        # horizontal radio — user clicks directly, no dropdown box
         p_sex = c3.radio("Sex", options=["Male", "Female", "Other"], index=0, horizontal=True)
-
-        p_history = st.text_area(
-            "Medical History",
-            placeholder="Enter clinical background, prior diagnoses, medications, family history...",
-            height=120
-        )
-
-        v_file = st.file_uploader("📹 Upload Session Video", type=["mp4"], label_visibility="visible")
-
+        p_history = st.text_area("Medical History",
+            placeholder="Enter clinical background, prior diagnoses, medications, family history...", height=120)
+        v_file = st.file_uploader("Upload Session Video", type=["mp4"])
         st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-        run_btn = st.button("🚀 Run Comprehensive Analysis", use_container_width=True, key="run_analysis")
-        st.markdown("</div>", unsafe_allow_html=True)
+        run_btn = st.button("Run Comprehensive Analysis", use_container_width=True, key="run_analysis")
 
     if v_file and run_btn:
-        with st.status("🔬 Analyzing via NVIDIA NIM...", expanded=True) as status:
+        with st.status("Analyzing via NVIDIA NIM...", expanded=True) as status:
             st.write("Preparing neuro-screening prompt...")
             prompt = (
                 f"Neuro-screening for {p_age}yo {p_sex}. History: {p_history}. "
@@ -449,96 +395,82 @@ elif st.session_state.role == "Doctor":
             out = res.choices[0].message.content
             doc_rep = out.split("###DOC###")[-1].split("###PAT###")[0].strip()
             pat_rep = out.split("###PAT###")[-1].strip()
-
             st.write("Syncing to database...")
             try:
                 supabase.table("patients").insert({
                     "user_id": st.session_state.user_uuid,
-                    "patient_id": p_id,
-                    "age": p_age,
-                    "doctor_report": doc_rep,
-                    "family_guide": pat_rep
+                    "patient_id": p_id, "age": p_age,
+                    "doctor_report": doc_rep, "family_guide": pat_rep
                 }).execute()
-                status.update(label="✅ Analysis complete & synced!", state="complete")
+                status.update(label="Analysis complete and synced!", state="complete")
             except Exception:
-                status.update(label="✅ Analysis complete (cloud sync deferred)", state="complete")
+                status.update(label="Analysis complete (cloud sync deferred)", state="complete")
 
-        st.markdown(f"<div style='margin-top:28px; color:{muted}; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;'>Analysis Results — {p_id}</div>", unsafe_allow_html=True)
-
-        tab1, tab2 = st.tabs(["🩺 Physician Report", "🏠 Family Guide"])
+        st.markdown(f"<div style='margin-top:28px; color:{muted}; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;'>Results - {p_id}</div>", unsafe_allow_html=True)
+        tab1, tab2 = st.tabs(["Physician Report", "Family Guide"])
         with tab1:
             report_card(doc_rep)
-            st.download_button("📑 Download Physician Report", f"CLINICAL DOC: {p_id}\n\n{doc_rep}", f"Doc_{p_id}.txt", use_container_width=True)
+            st.download_button("Download Physician Report", f"CLINICAL DOC: {p_id}\n\n{doc_rep}", f"Doc_{p_id}.txt", use_container_width=True)
         with tab2:
             report_card(pat_rep, border_color=accent2)
-            st.download_button("🏡 Download Family Guide", f"FAMILY SUMMARY: {p_id}\n\n{pat_rep}", f"Family_{p_id}.txt", use_container_width=True)
+            st.download_button("Download Family Guide", f"FAMILY SUMMARY: {p_id}\n\n{pat_rep}", f"Family_{p_id}.txt", use_container_width=True)
 
     elif run_btn and not v_file:
-        st.warning("⚠️ Please upload a session video before running analysis.")
+        st.warning("Please upload a session video before running analysis.")
 
-    # ── Recent Patients ───────────────────────────
     st.markdown(f"<div style='height:1px; background:{border}; margin:32px 0 24px 0;'></div>", unsafe_allow_html=True)
     st.markdown(f"<div style='color:{muted}; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px;'>Recent Patient Records</div>", unsafe_allow_html=True)
 
     try:
-        records = supabase.table("patients").select("*") \
-            .eq("user_id", st.session_state.user_uuid) \
-            .order("created_at", descending=True).limit(10).execute()
-
+        records = supabase.table("patients").select("*").eq("user_id", st.session_state.user_uuid).order("created_at", descending=True).limit(10).execute()
         if records.data:
             for rec in records.data:
                 col_info, col_btn = st.columns([4, 1])
                 with col_info:
                     date_str = rec.get("created_at", "")[:10]
-                    age_str  = rec.get("age", "—")
-                    pid_str  = rec.get("patient_id", "—")
+                    pid_str  = rec.get("patient_id", "-")
+                    age_str  = rec.get("age", "-")
                     preview  = (rec.get("doctor_report") or "")[:120].replace("\n", " ")
                     st.markdown(f"""
                     <div style="background:{card}; border:1px solid {border}; border-radius:10px; padding:16px 20px; margin-bottom:10px;">
                         <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
                             <span style="font-weight:700; font-size:15px;">{pid_str}</span>
-                            <span style="color:{muted}; font-size:12px;">·</span>
+                            <span style="color:{muted};">·</span>
                             <span style="color:{muted}; font-size:13px;">Age {age_str}</span>
-                            <span style="color:{muted}; font-size:12px;">·</span>
+                            <span style="color:{muted};">·</span>
                             <span style="color:{muted}; font-size:12px;">{date_str}</span>
                         </div>
-                        <div style="color:{muted}; font-size:13px; line-height:1.5;">{preview}{"..." if len(preview) >= 120 else ""}</div>
+                        <div style="color:{muted}; font-size:13px; line-height:1.5;">{preview}{"..." if len(preview)>=120 else ""}</div>
                     </div>
                     """, unsafe_allow_html=True)
                 with col_btn:
                     st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
-                    if st.button("View →", key=f"view_{rec.get('id', rec.get('patient_id',''))}"):
+                    if st.button("View", key=f"view_{rec.get('id', rec.get('patient_id',''))}"):
                         st.session_state.patient_view = rec
                         st.session_state.page = "patient_report"
                         st.rerun()
         else:
             st.markdown(f"""
             <div style="background:{card}; border:1px dashed {border}; border-radius:12px; padding:32px; text-align:center;">
-                <div style="font-size:32px; margin-bottom:10px;">📭</div>
                 <div style="color:{muted}; font-size:14px;">No patient records yet. Run your first analysis above.</div>
             </div>
             """, unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Could not load patient records: {e}")
 
-# ─────────────────────────────────────────
-# --- 8. PATIENT PORTAL ---
-# ─────────────────────────────────────────
+
+# ─── PATIENT PORTAL ──────────────────────────────────
 else:
-    page_header("🏠", "My Health Portal", "View your latest cognitive screening summary")
+    page_header("My Health Portal", "View your latest cognitive screening summary")
 
     try:
-        res = supabase.table("patients").select("*") \
-            .eq("user_id", st.session_state.user_uuid) \
-            .order("created_at", descending=True).limit(5).execute()
-
+        res = supabase.table("patients").select("*").eq("user_id", st.session_state.user_uuid).order("created_at", descending=True).limit(5).execute()
         if res.data:
-            latest = res.data[0]
+            latest   = res.data[0]
             date_str = latest.get("created_at", "")[:10]
-            pid_str  = latest.get("patient_id", "—")
-            age_str  = latest.get("age", "—")
+            pid_str  = latest.get("patient_id", "-")
+            age_str  = latest.get("age", "-")
 
-            # Stats
             st.markdown(f"""
             <div style="display:flex; gap:14px; margin-bottom:28px;">
                 {stat_card("Patient ID", pid_str)}
@@ -547,24 +479,19 @@ else:
             </div>
             """, unsafe_allow_html=True)
 
-            # Latest report
             st.markdown(f"<div style='color:{muted}; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;'>Your Latest Report</div>", unsafe_allow_html=True)
             report_card(latest.get("family_guide", "No report content available."), border_color=accent2)
-            st.download_button(
-                "📥 Download My Summary",
+            st.download_button("Download My Summary",
                 data=f"YOUR HEALTH SUMMARY\nDate: {date_str}\n\n{latest.get('family_guide','')}",
-                file_name="My_CogniScan_Report.txt",
-                use_container_width=True
-            )
+                file_name="My_CogniScan_Report.txt", use_container_width=True)
 
-            # History
             if len(res.data) > 1:
                 st.markdown(f"<div style='height:1px; background:{border}; margin:32px 0 24px 0;'></div>", unsafe_allow_html=True)
                 st.markdown(f"<div style='color:{muted}; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px;'>Report History</div>", unsafe_allow_html=True)
                 for rec in res.data[1:]:
                     d = rec.get("created_at","")[:10]
                     preview = (rec.get("family_guide") or "")[:100].replace("\n"," ")
-                    col_a, col_b = st.columns([4,1])
+                    col_a, col_b = st.columns([4, 1])
                     with col_a:
                         st.markdown(f"""
                         <div style="background:{card}; border:1px solid {border}; border-radius:10px; padding:14px 18px; margin-bottom:8px;">
@@ -574,18 +501,15 @@ else:
                         """, unsafe_allow_html=True)
                     with col_b:
                         st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-                        st.download_button(
-                            "⬇️",
+                        st.download_button("Download",
                             data=f"REPORT {d}\n\n{rec.get('family_guide','')}",
                             file_name=f"Report_{d}.txt",
-                            key=f"dl_{rec.get('id', d)}"
-                        )
+                            key=f"dl_{rec.get('id', d)}")
         else:
             st.markdown(f"""
             <div style="background:{card}; border:1px dashed {border}; border-radius:16px; padding:48px 32px; text-align:center; margin-top:32px;">
-                <div style="font-size:48px; margin-bottom:16px;">📋</div>
                 <h3 style="margin:0 0 8px 0; font-weight:600;">No Reports Yet</h3>
-                <p style="color:{muted}; font-size:14px; margin:0;">Your doctor hasn't uploaded a screening report for your account yet. Please check back after your next appointment.</p>
+                <p style="color:{muted}; font-size:14px; margin:0;">Your doctor has not uploaded a screening report yet. Check back after your next appointment.</p>
             </div>
             """, unsafe_allow_html=True)
 
