@@ -169,6 +169,39 @@ hr {{ border-color: {border} !important; }}
 /* Caption */
 .stCaption {{ color: {muted} !important; font-size: 12px !important; }}
 
+/* Radio — pill style */
+[data-testid="stRadio"] > div {{
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+}}
+[data-testid="stRadio"] label {{
+    background: {card} !important;
+    border: 1px solid {border} !important;
+    border-radius: 20px !important;
+    padding: 5px 14px !important;
+    cursor: pointer !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    transition: all 0.15s ease !important;
+    color: {txt} !important;
+}}
+[data-testid="stRadio"] label:hover {{
+    border-color: {accent} !important;
+    color: {accent} !important;
+    background: rgba(124,106,247,0.08) !important;
+}}
+/* Hide the actual radio circle dot */
+[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {{ margin: 0 !important; }}
+[data-testid="stRadio"] input[type="radio"] {{ display: none !important; }}
+[data-testid="stRadio"] input[type="radio"]:checked + div label,
+[data-testid="stRadio"] div:has(input:checked) label {{
+    background: {accent} !important;
+    border-color: {accent} !important;
+    color: #fff !important;
+}}
+
 /* Metric */
 [data-testid="metric-container"] {{
     background: {card} !important;
@@ -294,7 +327,7 @@ if not st.session_state.auth_status:
             email_in = st.text_input("📧 Email Address", key="login_email", placeholder="you@hospital.com")
             pass_in  = st.text_input("🔑 Password", type="password", key="login_pass", placeholder="••••••••••")
             st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-            submit = st.form_submit_button("Authorize Access →", use_container_width=True)
+            submit = st.form_submit_button("Authorize Access  ➜", use_container_width=True)
             if submit:
                 try:
                     res = supabase.auth.sign_in_with_password({"email": email_in, "password": pass_in})
@@ -366,8 +399,8 @@ elif st.session_state.role == "Doctor":
         c1, c2, c3 = st.columns([2, 1, 1])
         p_id  = c1.text_input("Patient ID", value="NC-2026", placeholder="NC-2026")
         p_age = c2.number_input("Age", min_value=18, max_value=110, value=72)
-        # selectbox with no free-text — uses radio-style options directly
-        p_sex = c3.selectbox("Sex", options=["Male", "Female", "Other"], index=0)
+        # horizontal radio — user clicks directly, no dropdown box
+        p_sex = c3.radio("Sex", options=["Male", "Female", "Other"], index=0, horizontal=True)
 
         p_history = st.text_area(
             "Medical History",
