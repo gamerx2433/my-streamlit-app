@@ -4,7 +4,7 @@ from supabase import create_client, Client
 import time
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="CogniScan", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="CogniScan", layout="wide")
 
 # --- 1. CREDENTIALS ---
 SUPABASE_URL = "https://bkaqwcwicmmaqzcuqtox.supabase.co"
