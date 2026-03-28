@@ -344,7 +344,7 @@ if not st.session_state.auth_status:
             email_in = st.text_input("📧 Email Address", key="login_email", placeholder="you@hospital.com")
             pass_in  = st.text_input("🔑 Password", type="password", key="login_pass", placeholder="••••••••••")
             st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
-            submit = st.form_submit_button("Authorize Access >>", use_container_width=True)
+            submit = st.form_submit_button("Authorize Access", use_container_width=True)
             if submit:
                 try:
                     res = supabase.auth.sign_in_with_password({"email": email_in, "password": pass_in})
