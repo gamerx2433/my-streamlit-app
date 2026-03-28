@@ -1,0 +1,12 @@
+# Ignore Streamlit secrets (VERY IMPORTANT)
+.streamlit/secrets.toml
+
+# Ignore Python cache and local environment files
+__pycache__/
+*.pyc
+.env
+.DS_Store
+
+# Ignore Colab-specific folders
+.config/
+sample_data/
