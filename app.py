@@ -422,7 +422,7 @@ elif st.session_state.role == "Doctor":
     st.markdown(f"<div style='color:{muted}; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px;'>Recent Patient Records</div>", unsafe_allow_html=True)
 
     try:
-        records = supabase.table("patients").select("*").eq("user_id", st.session_state.user_uuid).order("created_at", descending=True).limit(10).execute()
+        records = supabase.table("patients").select("*").eq("user_id", st.session_state.user_uuid).order("created_at", desc=True).limit(10).execute()
         if records.data:
             for rec in records.data:
                 col_info, col_btn = st.columns([4, 1])
@@ -464,7 +464,7 @@ else:
     page_header("My Health Portal", "View your latest cognitive screening summary")
 
     try:
-        res = supabase.table("patients").select("*").eq("user_id", st.session_state.user_uuid).order("created_at", descending=True).limit(5).execute()
+        res = supabase.table("patients").select("*").eq("user_id", st.session_state.user_uuid).order("created_at", desc=True).limit(5).execute()
         if res.data:
             latest   = res.data[0]
             date_str = latest.get("created_at", "")[:10]
